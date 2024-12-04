@@ -14,6 +14,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.basitbhatti.socialapp.ui.theme.SocialAppTheme
 
 class MainActivity : ComponentActivity() {
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -28,6 +30,9 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+
+
 }
 
 @Composable
