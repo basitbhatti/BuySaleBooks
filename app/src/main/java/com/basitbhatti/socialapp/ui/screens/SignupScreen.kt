@@ -19,7 +19,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -37,8 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -169,11 +166,15 @@ fun SignupScreen(modifier: Modifier = Modifier) {
                 ),
                 trailingIcon = {
                     Icon(
-                        imageVector = Icons.Default.RemoveRedEye,
+                        painter = if (passwordVisible) painterResource(R.drawable.password_1) else painterResource(
+                            R.drawable.password_0
+                        ),
                         contentDescription = "",
-                        modifier.clickable {
-                            passwordVisible = !passwordVisible
-                        })
+                        modifier
+                            .size(20.dp)
+                            .clickable {
+                                passwordVisible = !passwordVisible
+                            })
                 }
             )
 
@@ -232,9 +233,7 @@ fun SignupScreen(modifier: Modifier = Modifier) {
                 }
             }
 
-
         }
-
 
     }
 
