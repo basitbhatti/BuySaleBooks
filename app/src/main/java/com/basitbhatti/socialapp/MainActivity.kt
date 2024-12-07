@@ -1,5 +1,6 @@
 package com.basitbhatti.socialapp
 
+import NavGraph
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,14 +18,12 @@ import com.basitbhatti.socialapp.ui.theme.SocialAppTheme
 
 class MainActivity : ComponentActivity() {
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             SocialAppTheme {
-                rememberNavController()
-                SignupScreen()
+                val navController = rememberNavController()
+                NavGraph(navController)
             }
         }
     }
