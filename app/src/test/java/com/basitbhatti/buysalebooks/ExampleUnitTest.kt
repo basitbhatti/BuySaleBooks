@@ -1,4 +1,4 @@
-package com.basitbhatti.socialapp
+package com.basitbhatti.buysalebooks
 
 import org.junit.Test
 

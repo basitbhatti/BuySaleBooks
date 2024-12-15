@@ -1,4 +1,4 @@
-package com.basitbhatti.socialapp.navigation
+package com.basitbhatti.buysalebooks.navigation
 
 sealed class Screen (val route : String) {
 

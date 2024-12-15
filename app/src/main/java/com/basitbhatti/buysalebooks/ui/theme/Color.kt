@@ -1,4 +1,4 @@
-package com.basitbhatti.socialapp.ui.theme
+package com.basitbhatti.buysalebooks.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

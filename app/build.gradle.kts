@@ -7,11 +7,11 @@ plugins {
 
 android {
 
-    namespace = "com.basitbhatti.socialapp"
+    namespace = "com.basitbhatti.buysalebooks"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.basitbhatti.socialapp"
+        applicationId = "com.basitbhatti.buysalebooks"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

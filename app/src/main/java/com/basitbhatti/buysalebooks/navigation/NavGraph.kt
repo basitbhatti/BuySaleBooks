@@ -2,9 +2,9 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.basitbhatti.socialapp.navigation.Screen
-import com.basitbhatti.socialapp.ui.screens.LoginScreen
-import com.basitbhatti.socialapp.ui.screens.SignupScreen
+import com.basitbhatti.buysalebooks.navigation.Screen
+import com.basitbhatti.buysalebooks.ui.screens.LoginScreen
+import com.basitbhatti.buysalebooks.ui.screens.SignupScreen
 
 @Composable
 fun NavGraph(controller: NavHostController) {

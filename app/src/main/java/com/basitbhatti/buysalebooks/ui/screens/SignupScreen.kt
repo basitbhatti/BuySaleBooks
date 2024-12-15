@@ -1,4 +1,4 @@
-package com.basitbhatti.socialapp.ui.screens
+package com.basitbhatti.buysalebooks.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -44,31 +44,26 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.basitbhatti.socialapp.R
+import com.basitbhatti.buysalebooks.R
 
 @Composable
 fun SignupScreen(modifier: Modifier = Modifier) {
-
 
     var fullName by remember {
         mutableStateOf("")
     }
 
-
     var emailAddress by remember {
         mutableStateOf("")
     }
-
 
     var password by remember {
         mutableStateOf("")
     }
 
-
     var passwordVisible by remember {
         mutableStateOf(false)
     }
-
 
     Box(
         modifier = modifier

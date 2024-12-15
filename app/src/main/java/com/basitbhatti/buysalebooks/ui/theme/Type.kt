@@ -1,4 +1,4 @@
-package com.basitbhatti.socialapp.ui.theme
+package com.basitbhatti.buysalebooks.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

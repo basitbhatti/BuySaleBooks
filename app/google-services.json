@@ -1,15 +1,15 @@
 {
   "project_info": {
     "project_number": "436609069658",
-    "project_id": "socialapp-86db2",
-    "storage_bucket": "socialapp-86db2.firebasestorage.app"
+    "project_id": "buysalebooks-86db2",
+    "storage_bucket": "buysalebooks-86db2.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
         "mobilesdk_app_id": "1:436609069658:android:d158f3f67b6b423ae5de63",
         "android_client_info": {
-          "package_name": "com.basitbhatti.socialapp"
+          "package_name": "com.basitbhatti.buysalebooks"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "436609069658-m65qn5ovsu5osf1b1k6tttle2an0u6hl.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.basitbhatti.socialapp",
+            "package_name": "com.basitbhatti.buysalebooks",
             "certificate_hash": "6bc58134b7cb98e7bcffb836d412255e2d81f254"
           }
         },
