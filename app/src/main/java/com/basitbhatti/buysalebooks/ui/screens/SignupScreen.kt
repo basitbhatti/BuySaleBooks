@@ -24,8 +24,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,10 +43,16 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.basitbhatti.buysalebooks.R
+import com.basitbhatti.buysalebooks.navigation.Screen
 
 @Composable
-fun SignupScreen(modifier: Modifier = Modifier) {
+fun SignupScreen(
+    modifier: Modifier = Modifier,
+    navController: NavHostController
+) {
 
     var fullName by remember {
         mutableStateOf("")
@@ -90,11 +95,10 @@ fun SignupScreen(modifier: Modifier = Modifier) {
                 )
             }
 
-            TextField(
+            OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .padding(horizontal = 20.dp),
                 value = fullName,
                 onValueChange = {
                     fullName = it
@@ -104,21 +108,18 @@ fun SignupScreen(modifier: Modifier = Modifier) {
                     Text(text = "Enter Full Name")
                 },
                 colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.LightGray,
-                    focusedContainerColor = Color.LightGray,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
                 ),
                 trailingIcon = {
                     Icon(imageVector = Icons.Default.Person, contentDescription = "")
                 }
             )
 
-            TextField(
+            OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, top = 20.dp)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .padding(start = 20.dp, end = 20.dp, top = 15.dp),
                 value = emailAddress,
                 onValueChange = {
                     emailAddress = it
@@ -128,10 +129,8 @@ fun SignupScreen(modifier: Modifier = Modifier) {
                     Text(text = "Enter Email Address")
                 },
                 colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.LightGray,
-                    focusedContainerColor = Color.LightGray,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
                 ),
                 trailingIcon = {
                     Icon(imageVector = Icons.Default.Email, contentDescription = "")
@@ -139,11 +138,10 @@ fun SignupScreen(modifier: Modifier = Modifier) {
             )
 
 
-            TextField(
+            OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, top = 20.dp)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .padding(start = 20.dp, end = 20.dp, top = 15.dp),
                 value = password,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -154,10 +152,8 @@ fun SignupScreen(modifier: Modifier = Modifier) {
                     Text(text = "Enter Password")
                 },
                 colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.LightGray,
-                    focusedContainerColor = Color.LightGray,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
                 ),
                 trailingIcon = {
                     Icon(
@@ -201,7 +197,10 @@ fun SignupScreen(modifier: Modifier = Modifier) {
                 Text(
                     "Log in.",
                     textDecoration = TextDecoration.Underline,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.clickable {
+                        navController.navigate(Screen.LoginScreen.route)
+                    }
                 )
             }
 
@@ -216,7 +215,7 @@ fun SignupScreen(modifier: Modifier = Modifier) {
                     .fillMaxWidth()
                     .height(60.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.LightGray
+                    containerColor = Color(0xFFE7E7E7)
                 )
             ) {
                 Row(
@@ -225,13 +224,24 @@ fun SignupScreen(modifier: Modifier = Modifier) {
                     horizontalArrangement = Arrangement.Center
                 ) {
 
+                    Image(
+                        painter = painterResource(R.drawable.ic_google),
+                        contentDescription = "google icon",
+                        modifier = Modifier.size(30.dp),
+                    )
+
+                    Spacer(Modifier.width(10.dp))
+
+                    Text(
+                        "Log in with Google",
+                        fontWeight = FontWeight.Medium
+                    )
+
                 }
             }
-
         }
 
     }
-
 
 }
 
@@ -243,5 +253,6 @@ fun signUpWithEmailPassword(fullName: String, emailAddress: String, password: St
 @Preview
 @Composable
 fun Preview(modifier: Modifier = Modifier) {
-    SignupScreen()
+    val navController = rememberNavController()
+    SignupScreen(navController = navController)
 }
