@@ -1,5 +1,9 @@
 package com.basitbhatti.buysalebooks.ui.screens
 
+import android.app.ProgressDialog
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -46,13 +51,19 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.basitbhatti.buysalebooks.R
+import com.basitbhatti.buysalebooks.model.User
 import com.basitbhatti.buysalebooks.navigation.Screen
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 @Composable
 fun SignupScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController
 ) {
+
+
+    val context = LocalContext.current
 
     var fullName by remember {
         mutableStateOf("")
@@ -171,7 +182,7 @@ fun SignupScreen(
 
             Button(
                 onClick = {
-                    signUpWithEmailPassword(fullName, emailAddress, password)
+                    signUpWithEmailPassword(context, fullName, emailAddress, password)
                 },
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -245,8 +256,43 @@ fun SignupScreen(
 
 }
 
-fun signUpWithEmailPassword(fullName: String, emailAddress: String, password: String) {
+fun signUpWithEmailPassword(
+    context: Context,
+    fullName: String,
+    emailAddress: String,
+    password: String
+) {
 
+    val progressDialog = ProgressDialog(context)
+    progressDialog.setMessage("Please wait while we log you in..")
+    progressDialog.setCancelable(false)
+    progressDialog.show()
+
+
+    val realtimeDb = FirebaseDatabase.getInstance()
+
+
+    FirebaseAuth.getInstance().signInWithEmailAndPassword(emailAddress, password)
+        .addOnSuccessListener {
+
+            val user = User("", fullName, emailAddress)
+
+            realtimeDb.getReference("users").child(emailAddress).setValue(user)
+                .addOnSuccessListener {
+                    progressDialog.dismiss()
+                    Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+
+                }.addOnFailureListener {
+                    progressDialog.dismiss()
+                    Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+                    Log.d("TAGAUTH", "signUpWithEmailPassword: ${it.message}")
+                }
+
+        }.addOnFailureListener {
+            progressDialog.dismiss()
+            Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+            Log.d("TAGAUTH", "signUpWithEmailPassword: ${it.message}")
+        }
 }
 
 
