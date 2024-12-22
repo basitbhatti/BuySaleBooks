@@ -52,10 +52,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.basitbhatti.buysalebooks.R
 import com.basitbhatti.buysalebooks.model.User
+import com.basitbhatti.buysalebooks.state.SignInState
 import com.basitbhatti.buysalebooks.utils.EMAIL_ADDRESS
 import com.basitbhatti.buysalebooks.utils.FULL_NAME
 import com.basitbhatti.buysalebooks.utils.USERNAME
 import com.basitbhatti.buysalebooks.utils.USERS
+import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -64,7 +66,12 @@ import com.google.firebase.database.ValueEventListener
 import com.pdftoexcel.bankstatementconverter.utils.PrefManager
 
 @Composable
-fun LoginScreen(navController: NavHostController, modifier: Modifier = Modifier) {
+fun LoginScreen(
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+    state: SignInState,
+    onSignInClick: () -> Unit
+) {
 
     val context = LocalContext.current
 
@@ -162,7 +169,7 @@ fun LoginScreen(navController: NavHostController, modifier: Modifier = Modifier)
 
             Button(
                 onClick = {
-                    if (emailAddress.isNotEmpty() || password.isNotEmpty()){
+                    if (emailAddress.isNotEmpty() || password.isNotEmpty()) {
                         loginWithEmailPassword(context = context, emailAddress, password)
                         emailAddress = ""
                         password = ""
@@ -289,7 +296,17 @@ fun loginWithEmailPassword(context: Context, email: String, pass: String) {
 
 }
 
-fun signInWithGoogle() {
+fun signInWithGoogle(context: Context) {
+
+    val signInRequest = BeginSignInRequest.builder()
+        .setGoogleIdTokenRequestOptions(
+            BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                .setSupported(true)
+                .setServerClientId(context.getString(R.string.web_client_id))
+                .setFilterByAuthorizedAccounts(true)
+                .build()
+        ).build()
+
 
 }
 

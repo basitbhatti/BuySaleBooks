@@ -3,11 +3,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.basitbhatti.buysalebooks.navigation.Screen
+import com.basitbhatti.buysalebooks.state.SignInState
 import com.basitbhatti.buysalebooks.ui.screens.LoginScreen
 import com.basitbhatti.buysalebooks.ui.screens.SignupScreen
 
 @Composable
-fun NavGraph(controller: NavHostController) {
+fun NavGraph(controller: NavHostController, state: SignInState, onSignInClick: () -> Unit) {
 
     NavHost(navController = controller, startDestination = Screen.SignupScreen.route) {
 

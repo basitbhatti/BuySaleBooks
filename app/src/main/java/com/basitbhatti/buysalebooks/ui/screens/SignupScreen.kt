@@ -54,6 +54,7 @@ import androidx.navigation.compose.rememberNavController
 import com.basitbhatti.buysalebooks.R
 import com.basitbhatti.buysalebooks.model.User
 import com.basitbhatti.buysalebooks.navigation.Screen
+import com.basitbhatti.buysalebooks.state.SignInState
 import com.basitbhatti.buysalebooks.utils.EMAIL_ADDRESS
 import com.basitbhatti.buysalebooks.utils.FULL_NAME
 import com.basitbhatti.buysalebooks.utils.USERNAME
@@ -64,8 +65,10 @@ import com.pdftoexcel.bankstatementconverter.utils.PrefManager
 
 @Composable
 fun SignupScreen(
+    navController: NavHostController,
     modifier: Modifier = Modifier,
-    navController: NavHostController
+    state: SignInState,
+    onSignInClick: () -> Unit
 ) {
 
     val context = LocalContext.current
