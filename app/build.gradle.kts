@@ -11,7 +11,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.basitbhatti.buysalebooks"
+        applicationId = "com.basitbhatti.socialapp"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

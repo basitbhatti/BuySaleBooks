@@ -48,20 +48,25 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.basitbhatti.buysalebooks.R
 import com.basitbhatti.buysalebooks.model.User
 import com.basitbhatti.buysalebooks.navigation.Screen
+import com.basitbhatti.buysalebooks.utils.EMAIL_ADDRESS
+import com.basitbhatti.buysalebooks.utils.FULL_NAME
+import com.basitbhatti.buysalebooks.utils.USERNAME
+import com.basitbhatti.buysalebooks.utils.USERS
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.pdftoexcel.bankstatementconverter.utils.PrefManager
 
 @Composable
 fun SignupScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController
 ) {
-
 
     val context = LocalContext.current
 
@@ -96,7 +101,7 @@ fun SignupScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
+                    .height(150.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -105,6 +110,13 @@ fun SignupScreen(
                     contentDescription = ""
                 )
             }
+
+            Text(
+                text = "Sign up",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 15.dp)
+            )
 
             OutlinedTextField(
                 modifier = Modifier
@@ -182,7 +194,15 @@ fun SignupScreen(
 
             Button(
                 onClick = {
-                    signUpWithEmailPassword(context, fullName, emailAddress, password)
+                    if (emailAddress.isNotEmpty() or password.isNotEmpty() or fullName.isNotEmpty()) {
+                        signUpWithEmailPassword(context, fullName, emailAddress, password)
+                        fullName = ""
+                        emailAddress = ""
+                        password = ""
+                    } else {
+                        Toast.makeText(context, "Empty Fields", Toast.LENGTH_SHORT).show()
+                    }
+
                 },
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -251,7 +271,6 @@ fun SignupScreen(
                 }
             }
         }
-
     }
 
 }
@@ -263,36 +282,48 @@ fun signUpWithEmailPassword(
     password: String
 ) {
 
+
+    val pref = PrefManager(context)
+
+    val auth = FirebaseAuth.getInstance()
+    val realtimeDatabase = FirebaseDatabase.getInstance()
+    val userRef = realtimeDatabase.getReference(USERS)
+
     val progressDialog = ProgressDialog(context)
     progressDialog.setMessage("Please wait while we log you in..")
     progressDialog.setCancelable(false)
     progressDialog.show()
 
+    auth.createUserWithEmailAndPassword(emailAddress, password).addOnSuccessListener {
+        Log.d("TAGAUTH", "Success")
 
-    val realtimeDb = FirebaseDatabase.getInstance()
+        val user = User(emailAddress.replace(".", ""), fullName, emailAddress)
 
+        userRef.child(user.username).setValue(user).addOnSuccessListener {
+            Log.d("TAGAUTH", "Success setValue")
 
-    FirebaseAuth.getInstance().signInWithEmailAndPassword(emailAddress, password)
-        .addOnSuccessListener {
+            pref.saveString(USERNAME, user.username)
+            pref.saveString(EMAIL_ADDRESS, user.email)
+            pref.saveString(FULL_NAME, user.fullName)
 
-            val user = User("", fullName, emailAddress)
-
-            realtimeDb.getReference("users").child(emailAddress).setValue(user)
-                .addOnSuccessListener {
-                    progressDialog.dismiss()
-                    Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
-
-                }.addOnFailureListener {
-                    progressDialog.dismiss()
-                    Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
-                    Log.d("TAGAUTH", "signUpWithEmailPassword: ${it.message}")
-                }
+            progressDialog.dismiss()
+            Toast.makeText(context, "Success.", Toast.LENGTH_SHORT).show()
 
         }.addOnFailureListener {
             progressDialog.dismiss()
-            Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
-            Log.d("TAGAUTH", "signUpWithEmailPassword: ${it.message}")
+            val user = auth.currentUser
+            user?.delete()
+            Log.d("TAGAUTH", "ee: $it")
+            Toast.makeText(context, "Could not sign up.", Toast.LENGTH_SHORT).show()
+
         }
+
+    }.addOnFailureListener {
+        progressDialog.dismiss()
+        Toast.makeText(context, "Could not sign up.", Toast.LENGTH_SHORT).show()
+        Log.d("TAGAUTH", "e: $it")
+    }
+
 }
 
 
