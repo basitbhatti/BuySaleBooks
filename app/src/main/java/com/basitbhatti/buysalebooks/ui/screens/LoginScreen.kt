@@ -1,9 +1,13 @@
 package com.basitbhatti.buysalebooks.ui.screens
 
+import android.app.Activity.RESULT_OK
 import android.app.ProgressDialog
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,32 +52,59 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.basitbhatti.buysalebooks.R
+import com.basitbhatti.buysalebooks.SignInViewModel
 import com.basitbhatti.buysalebooks.model.User
-import com.basitbhatti.buysalebooks.state.SignInState
 import com.basitbhatti.buysalebooks.utils.EMAIL_ADDRESS
 import com.basitbhatti.buysalebooks.utils.FULL_NAME
+import com.basitbhatti.buysalebooks.utils.GoogleAuthUiClient
 import com.basitbhatti.buysalebooks.utils.USERNAME
 import com.basitbhatti.buysalebooks.utils.USERS
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
+import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.pdftoexcel.bankstatementconverter.utils.PrefManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    state: SignInState,
-    onSignInClick: () -> Unit
+    viewModel: SignInViewModel
 ) {
 
     val context = LocalContext.current
+
+    val googleAuthUiClient by lazy {
+        GoogleAuthUiClient(
+            context = context,
+            oneTapClient = Identity.getSignInClient(context)
+        )
+    }
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult(),
+        onResult = { result ->
+            if (result.resultCode == RESULT_OK) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val signInResult =
+                        googleAuthUiClient.signInWithIntent(result.data ?: return@launch)
+                    viewModel.onSignInResult(signInResult)
+                }
+            }
+
+        }
+    )
 
     var emailAddress by remember {
         mutableStateOf("")
@@ -119,7 +150,6 @@ fun LoginScreen(
                 modifier = Modifier.padding(vertical = 15.dp)
             )
 
-
             OutlinedTextField(modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 20.dp, top = 15.dp),
@@ -138,7 +168,6 @@ fun LoginScreen(
                 trailingIcon = {
                     Icon(imageVector = Icons.Default.Email, contentDescription = "")
                 })
-
 
             OutlinedTextField(modifier = Modifier
                 .fillMaxWidth()
@@ -217,7 +246,14 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .height(60.dp),
                 onClick = {
-                    signInWithGoogle()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val signInIntentSender = googleAuthUiClient.signIn()
+                        launcher.launch(
+                            IntentSenderRequest.Builder(
+                                signInIntentSender ?: return@launch
+                            ).build()
+                        )
+                    }
                 },
                 colors = CardDefaults.cardColors(
                     containerColor = Color(0xFFE7E7E7)
@@ -296,23 +332,9 @@ fun loginWithEmailPassword(context: Context, email: String, pass: String) {
 
 }
 
-fun signInWithGoogle(context: Context) {
-
-    val signInRequest = BeginSignInRequest.builder()
-        .setGoogleIdTokenRequestOptions(
-            BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                .setSupported(true)
-                .setServerClientId(context.getString(R.string.web_client_id))
-                .setFilterByAuthorizedAccounts(true)
-                .build()
-        ).build()
-
-
-}
 
 @Preview
 @Composable
 private fun Preview() {
     val navController = rememberNavController()
-    LoginScreen(navController = navController)
 }

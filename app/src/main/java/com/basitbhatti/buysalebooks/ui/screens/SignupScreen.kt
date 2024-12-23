@@ -1,9 +1,13 @@
 package com.basitbhatti.buysalebooks.ui.screens
 
+import android.app.Activity.RESULT_OK
 import android.app.ProgressDialog
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,6 +36,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,29 +54,69 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.basitbhatti.buysalebooks.R
+import com.basitbhatti.buysalebooks.SignInViewModel
 import com.basitbhatti.buysalebooks.model.User
 import com.basitbhatti.buysalebooks.navigation.Screen
-import com.basitbhatti.buysalebooks.state.SignInState
 import com.basitbhatti.buysalebooks.utils.EMAIL_ADDRESS
 import com.basitbhatti.buysalebooks.utils.FULL_NAME
+import com.basitbhatti.buysalebooks.utils.GoogleAuthUiClient
 import com.basitbhatti.buysalebooks.utils.USERNAME
 import com.basitbhatti.buysalebooks.utils.USERS
+import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.pdftoexcel.bankstatementconverter.utils.PrefManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignupScreen(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    state: SignInState,
-    onSignInClick: () -> Unit
+    viewModel: SignInViewModel
 ) {
 
     val context = LocalContext.current
+
+    val googleAuthUiClient by lazy {
+        GoogleAuthUiClient(
+            context = context,
+            oneTapClient = Identity.getSignInClient(context)
+        )
+    }
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect( key1 = state.isSignInSuccessful) { 
+        if (state.isSignInSuccessful){
+            Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
+            Log.d("TAGAuth", "SignupScreen: ${state.signInError}")
+        }
+    }
+
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult(),
+        onResult = { result ->
+            if (result.resultCode == RESULT_OK) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val signInResult =
+                        googleAuthUiClient.signInWithIntent(result.data ?: return@launch)
+                    viewModel.onSignInResult(signInResult)
+                }
+            }
+
+        }
+    )
+
+
 
     var fullName by remember {
         mutableStateOf("")
@@ -250,7 +295,20 @@ fun SignupScreen(
                     .height(60.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = Color(0xFFE7E7E7)
-                )
+                ),
+                onClick = {
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val signInIntentSender = googleAuthUiClient.signIn()
+                        launcher.launch(
+                            IntentSenderRequest.Builder(
+                                signInIntentSender?:return@launch
+                            ).build()
+                        )
+                    }
+
+
+                }
             ) {
                 Row(
                     modifier = Modifier.fillMaxSize(),
@@ -285,7 +343,6 @@ fun signUpWithEmailPassword(
     password: String
 ) {
 
-
     val pref = PrefManager(context)
 
     val auth = FirebaseAuth.getInstance()
@@ -300,7 +357,15 @@ fun signUpWithEmailPassword(
     auth.createUserWithEmailAndPassword(emailAddress, password).addOnSuccessListener {
         Log.d("TAGAUTH", "Success")
 
-        val user = User(emailAddress.replace(".", ""), fullName, emailAddress)
+        val firebaseUser = it.user
+
+        val user = User(
+            username = emailAddress.replace(".", ""),
+            fullName = fullName,
+            email = emailAddress,
+            userId = firebaseUser!!.uid.toString(),
+            profileUrl = firebaseUser!!.photoUrl.toString()
+        )
 
         userRef.child(user.username).setValue(user).addOnSuccessListener {
             Log.d("TAGAUTH", "Success setValue")
@@ -334,5 +399,4 @@ fun signUpWithEmailPassword(
 @Composable
 fun Preview(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
-    SignupScreen(navController = navController)
 }
