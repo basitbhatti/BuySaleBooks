@@ -11,6 +11,7 @@ import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.pdftoexcel.bankstatementconverter.utils.PrefManager
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.tasks.await
 
@@ -45,6 +46,12 @@ class GoogleAuthUiClient(
         return try {
 
             val user = auth.signInWithCredential(googleCredentials).await().user
+
+            val pref = PrefManager(context)
+
+            pref.saveString(USERNAME, user!!.email.toString().replace(".",""))
+            pref.saveString(EMAIL_ADDRESS, user!!.email.toString())
+            pref.saveString(FULL_NAME, user.displayName.toString())
 
             return SignInResult(
                 data = user?.run {

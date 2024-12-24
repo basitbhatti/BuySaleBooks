@@ -92,7 +92,7 @@ fun SignupScreen(
 
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect( key1 = state.isSignInSuccessful) { 
+    LaunchedEffect(key1 = state.isSignInSuccessful) {
         if (state.isSignInSuccessful){
             Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show()
         } else {
@@ -100,7 +100,6 @@ fun SignupScreen(
             Log.d("TAGAuth", "SignupScreen: ${state.signInError}")
         }
     }
-
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult(),
@@ -112,11 +111,8 @@ fun SignupScreen(
                     viewModel.onSignInResult(signInResult)
                 }
             }
-
         }
     )
-
-
 
     var fullName by remember {
         mutableStateOf("")
@@ -207,7 +203,6 @@ fun SignupScreen(
                     Icon(imageVector = Icons.Default.Email, contentDescription = "")
                 }
             )
-
 
             OutlinedTextField(
                 modifier = Modifier
