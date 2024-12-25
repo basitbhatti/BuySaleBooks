@@ -18,7 +18,6 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val viewModel = viewModel<SignInViewModel>()
 
-
                 NavGraph(navController, viewModel)
             }
         }

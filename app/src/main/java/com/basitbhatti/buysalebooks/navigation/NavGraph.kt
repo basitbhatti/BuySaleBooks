@@ -4,6 +4,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.basitbhatti.buysalebooks.SignInViewModel
 import com.basitbhatti.buysalebooks.navigation.Screen
+import com.basitbhatti.buysalebooks.ui.screens.AddPostScreen
+import com.basitbhatti.buysalebooks.ui.screens.HomeScreen
 import com.basitbhatti.buysalebooks.ui.screens.LoginScreen
 import com.basitbhatti.buysalebooks.ui.screens.SignupScreen
 
@@ -18,6 +20,13 @@ fun NavGraph(controller: NavHostController, viewModel: SignInViewModel) {
 
         composable(route = Screen.LoginScreen.route) {
             LoginScreen(navController = controller, viewModel = viewModel)
+        }
+
+        composable(route = Screen.HomeScreen.route) {
+            HomeScreen(controller = controller)
+        }
+        composable(route = Screen.AddPostScreen.route) {
+            AddPostScreen(controller = controller)
         }
 
     }

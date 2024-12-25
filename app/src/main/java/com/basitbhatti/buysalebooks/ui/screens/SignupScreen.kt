@@ -93,8 +93,11 @@ fun SignupScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = state.isSignInSuccessful) {
-        if (state.isSignInSuccessful){
+        if (state.isSignInSuccessful) {
             Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show()
+            navController.navigate(Screen.HomeScreen.route) {
+                popUpTo(0)
+            }
         } else {
             Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
             Log.d("TAGAuth", "SignupScreen: ${state.signInError}")
@@ -113,6 +116,13 @@ fun SignupScreen(
             }
         }
     )
+
+    if (googleAuthUiClient.getSignedInUser() != null) {
+        navController.navigate(Screen.HomeScreen.route) {
+            popUpTo(0)
+        }
+
+    }
 
     var fullName by remember {
         mutableStateOf("")
@@ -297,7 +307,7 @@ fun SignupScreen(
                         val signInIntentSender = googleAuthUiClient.signIn()
                         launcher.launch(
                             IntentSenderRequest.Builder(
-                                signInIntentSender?:return@launch
+                                signInIntentSender ?: return@launch
                             ).build()
                         )
                     }
